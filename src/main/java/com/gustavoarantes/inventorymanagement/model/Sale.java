@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "sellings")
-public class Sell {
+public class Sale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +33,5 @@ public class Sell {
     private BigDecimal totalValue;
 
     @OneToMany(mappedBy = "sell", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<SellItem> items = new HashSet<>();
+    private Set<SaleItem> items = new HashSet<>();
 }

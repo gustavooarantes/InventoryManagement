@@ -12,16 +12,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Entity
 @Table(name = "selling_items")
-public class SellItem {
+public class SaleItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "selling_id", nullable = false) // Chave estrangeira para a tabela 'vendas'.
+    @JoinColumn(name = "selling_id", nullable = false)
     @ToString.Exclude
-    private Sell sell;
+    private Sale sale;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +29,7 @@ public class SellItem {
     private Product product;
 
     @Column(nullable = false)
-    private int quantiti;
+    private int quantity;
 
     @Column(name = "unit_price", nullable = false)
     private BigDecimal unitPrice;
