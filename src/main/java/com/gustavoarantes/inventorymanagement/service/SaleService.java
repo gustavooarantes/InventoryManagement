@@ -11,6 +11,8 @@ import com.gustavoarantes.inventorymanagement.repository.ProductRepository;
 import com.gustavoarantes.inventorymanagement.repository.SaleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,10 +24,14 @@ public class SaleService {
 
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
+    private final RabbitTemplate rabbitTemplate;
+    private final Queue queue;
 
-    public SaleService(SaleRepository saleRepository, ProductRepository productRepository) {
+    public SaleService(SaleRepository saleRepository, ProductRepository productRepository, RabbitTemplate rabbitTemplate, Queue queue) {
         this.saleRepository = saleRepository;
         this.productRepository = productRepository;
+        this.rabbitTemplate = rabbitTemplate;
+        this.queue = queue;
     }
 
     @Transactional
@@ -43,6 +49,15 @@ public class SaleService {
 
             if (product.getStockQuantity() < itemDTO.quantity()) {
                 throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
+            }
+
+            int newStockQuantity = product.getStockQuantity() - itemDTO.quantity();
+            product.setStockQuantity(newStockQuantity);
+            productRepository.save(product);
+
+            if (newStockQuantity <= product.getCriticalStockLimit()) {
+                String notificationMessage = "Critical stock alert for product: " + product.getName() + " (ID: " + product.getId() + "). Current stock: " + newStockQuantity;
+                rabbitTemplate.convertAndSend(this.queue.getName(), notificationMessage);
             }
 
             product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
