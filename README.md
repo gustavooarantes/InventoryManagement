@@ -1,7 +1,36 @@
 # Inventory Management API
+## Developer: Gustavo Arantes
 
 A comprehensive and robust RESTful API for managing product inventory, sales, and notifications. This project is built with Java 17 and the Spring Boot framework.
 
+---
+## Project Structure
+<pre>
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com
+    │   │       └── gustavoarantes
+    │   │           └── inventorymanagement
+    │   │               ├── config
+    │   │               ├── controller
+    │   │               ├── dto
+    │   │               ├── enums
+    │   │               ├── exception
+    │   │               ├── model
+    │   │               ├── repository
+    │   │               └── service
+    │   └── resources
+    │       ├── static
+    │       └── templates
+    └── test
+        └── java
+            └── com
+                └── gustavoarantes
+                    └── inventorymanagement
+                        ├── controller
+                        └── service
+</pre>
 ---
 
 ## Features
