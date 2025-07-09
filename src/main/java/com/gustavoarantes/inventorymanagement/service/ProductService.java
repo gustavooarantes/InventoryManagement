@@ -5,6 +5,9 @@ import com.gustavoarantes.inventorymanagement.exception.ResourceNotFoundExceptio
 import com.gustavoarantes.inventorymanagement.model.Product;
 import com.gustavoarantes.inventorymanagement.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("products")
     public List<ProductDTO> listAll() {
         return productRepository.findAll()
                 .stream()
@@ -48,6 +52,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "products", key = "#id")
     public ProductDTO findById(Long id) {
         return productRepository.findById(id)
                 .map(this::toDto)
@@ -65,6 +70,10 @@ public class ProductService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products", key = "#id")
+    })
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
@@ -76,6 +85,10 @@ public class ProductService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products", key = "#id")
+    })
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product with id " + id + " not found.");
